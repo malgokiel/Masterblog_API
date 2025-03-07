@@ -8,12 +8,20 @@ CORS(app)  # This will enable CORS for all routes
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
+    """
+    Fetches all the posts from API,
+    but allows the user to filter or sort them before returning.
+    POST method allows the user to add a new post to the API.
+    """
     POSTS = helper.get_all_posts()
     if request.method == 'POST':
         new_post = request.get_json()
         if not helper.validate_post_data(new_post):
             return jsonify({"error": "Invalid post title or content"}), 400
-        new_id = max(post['id'] for post in POSTS) + 1
+        if POSTS:
+            new_id = max(post['id'] for post in POSTS) + 1
+        else:
+            new_id = 1
         new_post['id'] = new_id
         POSTS.append(new_post)
         helper.save_all_posts_to_file(POSTS)
@@ -52,6 +60,9 @@ def get_posts():
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
+    """
+    If a post with a given id exists, deletes it from API.
+    """
     post = helper.find_post_by_id(id)
     if post is None:
         return '', 404
@@ -63,6 +74,9 @@ def delete_post(id):
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update_post(id):
+    """
+    If a post with a given id exists, updates it in API.
+    """
     post = helper.find_post_by_id(id)
     if post is None:
         return '', 404
@@ -71,6 +85,7 @@ def update_post(id):
     return jsonify(post)
 
 
+# Error handlers:
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Not Found"}), 404
