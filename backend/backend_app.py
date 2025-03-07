@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from operator import itemgetter
 import helper
+from datetime import date
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -23,6 +24,7 @@ def get_posts():
         else:
             new_id = 1
         new_post['id'] = new_id
+        new_post['date'] = str(date.today())
         POSTS.append(new_post)
         helper.save_all_posts_to_file(POSTS)
         return jsonify(new_post), 201
