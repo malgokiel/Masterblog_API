@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from operator import itemgetter
 import helper
-from datetime import date
+from datetime import date as get_date
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -24,26 +24,27 @@ def get_posts():
         else:
             new_id = 1
         new_post['id'] = new_id
-        new_post['date'] = str(date.today())
+        new_post['date'] = str(get_date.today())
         POSTS.append(new_post)
         helper.save_all_posts_to_file(POSTS)
         return jsonify(new_post), 201
     else:
         title = request.args.get('title')
         content = request.args.get('content')
+        author = request.args.get('author')
+        date = request.args.get('date')
         sort = request.args.get('sort')
         direction = request.args.get('direction')
 
-        if title and content:
-            filtered_posts = [post for post in POSTS if title in post['title'].casefold()
-                              and content in post['content'].casefold()]
-            return jsonify(filtered_posts)
-        elif title:
-            filtered_posts = [post for post in POSTS if title in post['title'].casefold()]
-            return jsonify(filtered_posts)
-        elif content:
-            filtered_posts  = [post for post in POSTS if content in post['content'].casefold()]
-            return jsonify(filtered_posts)
+        user_filters = {'title': title, 'content': content, 'author': author, 'date': date}
+        filtered_posts = POSTS
+        if any(filter_content for filter_content in user_filters.values()):
+            for filter_type, filter_content in user_filters.items():
+                if filter_content:
+                    filtered_posts = [post for post in filtered_posts if filter_content in post[filter_type].casefold()]
+            return filtered_posts
+
+
         if sort or direction:
             if helper.validate_filters(sort, direction):
                 if sort and direction:
