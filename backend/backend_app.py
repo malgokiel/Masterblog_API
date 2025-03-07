@@ -1,29 +1,22 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from operator import itemgetter
+import helper
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-POSTS = [
-    {"id": 1, "title": "First post", "content": "This is the first post."},
-    {"id": 2, "title": "Second post", "content": "This is the second post."},
-]
-
-def validate_post_data(data):
-    if not data['title'] or not data['content']:
-        return False
-    return True
-
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
+    POSTS = helper.get_all_posts()
     if request.method == 'POST':
         new_post = request.get_json()
-        if not validate_post_data(new_post):
+        if not helper.validate_post_data(new_post):
             return jsonify({"error": "Invalid post title or content"}), 400
         new_id = max(post['id'] for post in POSTS) + 1
         new_post['id'] = new_id
         POSTS.append(new_post)
+        helper.save_all_posts_to_file(POSTS)
         return jsonify(new_post), 201
     else:
         title = request.args.get('title')
@@ -41,55 +34,41 @@ def get_posts():
         elif content:
             filtered_posts  = [post for post in POSTS if content in post['content'].casefold()]
             return jsonify(filtered_posts)
-
-        if validate_filters(sort, direction):
-            if sort and direction:
-                sorted_posts = sorted(POSTS, key=itemgetter(sort), reverse=direction == 'desc')
-                return jsonify(sorted_posts)
-            elif sort:
-                sorted_posts = sorted(POSTS, key=itemgetter(sort))
-                return jsonify(sorted_posts)
-            elif direction:
-                sorted_posts = sorted(POSTS, key=itemgetter('id'), reverse=direction == 'desc')
-                return jsonify(sorted_posts)
-        else:
-            return jsonify({"error": "Bad Request"}), 400
+        if sort or direction:
+            if helper.validate_filters(sort, direction):
+                if sort and direction:
+                    sorted_posts = sorted(POSTS, key=itemgetter(sort), reverse=direction == 'desc')
+                    return jsonify(sorted_posts)
+                elif sort:
+                    sorted_posts = sorted(POSTS, key=itemgetter(sort))
+                    return jsonify(sorted_posts)
+                elif direction:
+                    sorted_posts = sorted(POSTS, key=itemgetter('id'), reverse=direction == 'desc')
+                    return jsonify(sorted_posts)
+            else:
+                return jsonify({"error": "Bad Request"}), 400
         return jsonify(POSTS)
 
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
-    post = find_post_by_id(id)
+    post = helper.find_post_by_id(id)
     if post is None:
         return '', 404
-    global POSTS
+    POSTS = helper.get_all_posts()
     new_posts = [post for post in POSTS if post['id'] != id]
-    POSTS = new_posts
+    helper.save_all_posts_to_file(new_posts)
     return jsonify(post)
 
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update_post(id):
-    post = find_post_by_id(id)
+    post = helper.find_post_by_id(id)
     if post is None:
         return '', 404
     new_data = request.get_json()
     post.update(new_data)
     return jsonify(post)
-
-
-def find_post_by_id(post_id):
-    post = [post for post in POSTS if post['id'] == post_id]
-    if post:
-        return post[0]
-    else:
-        return None
-
-
-def validate_filters(sort, direction):
-    if sort in ['', 'title', 'content'] and direction in ['', 'asc', 'desc']:
-        return True
-    return False
 
 
 @app.errorhandler(404)
