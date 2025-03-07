@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from operator import itemgetter
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -17,19 +18,18 @@ def validate_post_data(data):
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
     if request.method == 'POST':
-
         new_post = request.get_json()
         if not validate_post_data(new_post):
             return jsonify({"error": "Invalid post title or content"}), 400
         new_id = max(post['id'] for post in POSTS) + 1
         new_post['id'] = new_id
-
         POSTS.append(new_post)
-
         return jsonify(new_post), 201
     else:
         title = request.args.get('title')
         content = request.args.get('content')
+        sort = request.args.get('sort')
+        direction = request.args.get('direction')
 
         if title and content:
             filtered_posts = [post for post in POSTS if title in post['title'].casefold()
@@ -41,19 +41,27 @@ def get_posts():
         elif content:
             filtered_posts  = [post for post in POSTS if content in post['content'].casefold()]
             return jsonify(filtered_posts)
+
+        if validate_filters(sort, direction):
+            if sort and direction:
+                sorted_posts = sorted(POSTS, key=itemgetter(sort), reverse=direction == 'desc')
+                return jsonify(sorted_posts)
+            elif sort:
+                sorted_posts = sorted(POSTS, key=itemgetter(sort))
+                return jsonify(sorted_posts)
+            elif direction:
+                sorted_posts = sorted(POSTS, key=itemgetter('id'), reverse=direction == 'desc')
+                return jsonify(sorted_posts)
         else:
-            return jsonify(POSTS)
-
-
+            return jsonify({"error": "Bad Request"}), 400
+        return jsonify(POSTS)
 
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
     post = find_post_by_id(id)
-
     if post is None:
         return '', 404
-
     global POSTS
     new_posts = [post for post in POSTS if post['id'] != id]
     POSTS = new_posts
@@ -63,14 +71,12 @@ def delete_post(id):
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update_post(id):
     post = find_post_by_id(id)
-
     if post is None:
         return '', 404
-
     new_data = request.get_json()
     post.update(new_data)
-
     return jsonify(post)
+
 
 def find_post_by_id(post_id):
     post = [post for post in POSTS if post['id'] == post_id]
@@ -78,6 +84,12 @@ def find_post_by_id(post_id):
         return post[0]
     else:
         return None
+
+
+def validate_filters(sort, direction):
+    if sort in ['', 'title', 'content'] and direction in ['', 'asc', 'desc']:
+        return True
+    return False
 
 
 @app.errorhandler(404)
