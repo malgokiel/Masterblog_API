@@ -48,10 +48,10 @@ def get_posts():
         if sort or direction:
             if helper.validate_filters(sort, direction):
                 if sort and direction:
-                    sorted_posts = sorted(POSTS, key=itemgetter(sort), reverse=direction == 'desc')
+                    sorted_posts = sorted(POSTS, key= lambda post: post[sort].casefold(), reverse=direction == 'desc')
                     return jsonify(sorted_posts)
                 elif sort:
-                    sorted_posts = sorted(POSTS, key=itemgetter(sort))
+                    sorted_posts = sorted(POSTS, key=lambda post: post[sort].casefold())
                     return jsonify(sorted_posts)
                 elif direction:
                     sorted_posts = sorted(POSTS, key=itemgetter('id'), reverse=direction == 'desc')
@@ -84,7 +84,14 @@ def update_post(id):
     if post is None:
         return '', 404
     new_data = request.get_json()
-    post.update(new_data)
+
+    POSTS = helper.get_all_posts()
+
+    for post in POSTS:
+        if post["id"] == id:
+            post.update(new_data)
+
+    helper.save_all_posts_to_file(POSTS)
     return jsonify(post)
 
 
