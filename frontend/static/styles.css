@@ -25,6 +25,7 @@ body {
     margin-bottom: 20px;
 }
 
+.input-field select,
 .input-field input,
 .input-field button {
     height: 40px;
@@ -36,6 +37,7 @@ body {
     transition: box-shadow 0.5s ease;
 }
 
+.input-field select,
 .input-field input {
     flex-grow: 1;
     margin-right: 10px;

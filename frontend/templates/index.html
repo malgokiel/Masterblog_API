@@ -24,12 +24,20 @@
             <input type="text" id="filter-title" placeholder="filter by title">
             <input type="text" id="filter-content" placeholder="filter by content">
             <input type="text" id="filter-author" placeholder="filter by author">
-            <input type="text" id="filter-date" placeholder="filter by date YYYY-MM_DD">
+            <input type="date" id="filter-date" placeholder="filter by date YYYY-MM-DD">
             <button onclick="filterPosts()">Filter</button>
         </div>
         <div class="input-field">
-            <input type="text" id="sort-element" placeholder="sort by">
-            <input type="text" id="sort-direction" placeholder="asc/desc">
+            <select id="sort-element">
+                <option value="author">author</option>
+                <option value="title">title</option>
+                <option value="title">content</option>
+                <option value="date">date</option>
+            </select>
+            <select id="sort-direction">
+                <option value="asc">ascending</option>
+                <option value="desc">descending</option>
+            </select>
             <button onclick="sortPosts()">Sort</button>
         </div>
         <div id="post-container">
