@@ -98,3 +98,28 @@ function filterPosts() {
         })
         .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
     }
+
+function sortPosts() {
+    var baseUrl = document.getElementById('api-base-url').value;
+    var sortElement = document.getElementById('sort-element').value;
+    var sortDirection = document.getElementById('sort-direction').value;
+
+    fetch(baseUrl + '/posts?sort=' + sortElement + '&direction=' + sortDirection)
+    .then(response => response.json())  // Parse the JSON data from the response
+        .then(data => {  // Once the data is ready, we can use it
+            // Clear out the post container first
+            const postContainer = document.getElementById('post-container');
+            postContainer.innerHTML = '';
+
+            // For each post in the response, create a new post element and add it to the page
+            data.forEach(post => {
+                console.log(data) // print
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><p>written by: ${post.author}</p><p>${post.date}</p>
+                <button onclick="deletePost(${post.id})">Delete</button>`;
+                postContainer.appendChild(postDiv);
+            });
+        })
+        .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
+    }

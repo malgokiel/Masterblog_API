@@ -60,6 +60,6 @@ def validate_filters(sort, direction):
     when filtering through the API.
     Returns boolean.
     """
-    if sort in [None, 'title', 'content', 'author', 'date'] and direction in [None, 'asc', 'desc']:
+    if sort in [None, '', 'title', 'content', 'author', 'date'] and direction in [None, '', 'asc', 'desc']:
         return True
     return False
