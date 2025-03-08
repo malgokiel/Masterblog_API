@@ -41,7 +41,7 @@ def get_posts():
         if any(filter_content for filter_content in user_filters.values()):
             for filter_type, filter_content in user_filters.items():
                 if filter_content:
-                    filtered_posts = [post for post in filtered_posts if filter_content in post[filter_type].casefold()]
+                    filtered_posts = [post for post in filtered_posts if filter_content.casefold() in post[filter_type].casefold()]
             return filtered_posts
 
 

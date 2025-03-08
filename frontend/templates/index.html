@@ -20,6 +20,13 @@
             <input type="text" id="post-author" placeholder="Enter Post Author">
             <button onclick="addPost()">Add Post</button>
         </div>
+        <div class="input-field">
+            <input type="text" id="filter-title" placeholder="filter by title">
+            <input type="text" id="filter-content" placeholder="filter by content">
+            <input type="text" id="filter-author" placeholder="filter by author">
+            <input type="text" id="filter-date" placeholder="filter by date YYYY-MM_DD">
+            <button onclick="filterPosts()">Filter</button>
+        </div>
         <div id="post-container">
             <!-- Blog posts will be inserted here by JavaScript -->
         </div>
