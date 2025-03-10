@@ -3,9 +3,23 @@ from flask_cors import CORS
 from operator import itemgetter
 import helper
 from datetime import date as get_date
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
+
+
+SWAGGER_URL="/api/docs"  # (1) swagger endpoint e.g. HTTP://localhost:5002/api/docs
+API_URL="/static/masterblog.json" # (2) ensure you create this dir and file
+
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': 'Masterblog API' # (3) You can change this if you like
+    }
+)
+app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 def get_posts():
@@ -18,7 +32,7 @@ def get_posts():
     if request.method == 'POST':
         new_post = request.get_json()
         if not helper.validate_post_data(new_post):
-            return jsonify({"error": "Invalid post title or content"}), 400
+            return jsonify({"error": "Invalid post title, content or author"}), 400
         if POSTS:
             new_id = max(post['id'] for post in POSTS) + 1
         else:

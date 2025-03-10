@@ -49,7 +49,7 @@ def validate_post_data(data):
     provided both a post's title and post's content.
     Returns boolean.
     """
-    if not data['title'] or not data['content']:
+    if not data['title'] or not data['content'] or not data['author']:
         return False
     return True
 
