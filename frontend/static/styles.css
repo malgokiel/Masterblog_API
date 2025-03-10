@@ -76,6 +76,10 @@ body {
     color: #333;
 }
 
+.side-info {
+    font-size: 13px;
+}
+
 .post button {
     position: absolute;
     top: 10px;

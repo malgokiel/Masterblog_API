@@ -27,8 +27,12 @@ function loadPosts() {
             data.forEach(post => {
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
-                postDiv.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><p>written by: ${post.author}</p><p>${post.date}</p>
+                postDiv.innerHTML = `<h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p class="side-info">written by: ${post.author}</p>
+                <p class="side-info">${post.date}</p>
                 <button onclick="deletePost(${post.id})">Delete</button>`;
+                console.log(postDiv.innerHTML);
                 postContainer.appendChild(postDiv);
             });
         })
@@ -72,6 +76,7 @@ function deletePost(postId) {
     .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
 }
 
+// Function to send a GET request to the API using available filters to fetch requested posts
 function filterPosts() {
     var baseUrl = document.getElementById('api-base-url').value;
     var filterTitle = document.getElementById('filter-title').value;
@@ -91,7 +96,10 @@ function filterPosts() {
                 console.log(data) // print
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
-                postDiv.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><p>written by: ${post.author}</p><p>${post.date}</p>
+                postDiv.innerHTML = `<h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p class="side-info">written by: ${post.author}</p>
+                <p class="side-info">${post.date}</p>
                 <button onclick="deletePost(${post.id})">Delete</button>`;
                 postContainer.appendChild(postDiv);
             });
@@ -99,6 +107,7 @@ function filterPosts() {
         .catch(error => console.error('Error:', error));  // If an error occurs, log it to the console
     }
 
+// Function to send a GET request to the API using available sorting options to fetch requested posts
 function sortPosts() {
     var baseUrl = document.getElementById('api-base-url').value;
     var sortElement = document.getElementById('sort-element').value;
@@ -116,7 +125,10 @@ function sortPosts() {
                 console.log(data) // print
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
-                postDiv.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><p>written by: ${post.author}</p><p>${post.date}</p>
+                postDiv.innerHTML = `<h2>${post.title}</h2>
+                <p>${post.content}</p>
+                <p class="side-info">written by: ${post.author}</p>
+                <p class="side-info">${post.date}</p>
                 <button onclick="deletePost(${post.id})">Delete</button>`;
                 postContainer.appendChild(postDiv);
             });
