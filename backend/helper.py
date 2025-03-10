@@ -35,8 +35,8 @@ def find_post_by_id(post_id):
     Function searches for a post in database, specified by post_id,
     then returns it
     """
-    POSTS = get_all_posts()
-    post = [post for post in POSTS if post['id'] == post_id]
+    posts = get_all_posts()
+    post = [post for post in posts if post['id'] == post_id]
     if post:
         return post[0]
     else:
