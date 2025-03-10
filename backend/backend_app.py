@@ -54,25 +54,38 @@ def get_posts():
         sort = request.args.get('sort')
         direction = request.args.get('direction')
 
-        user_filters = {'title': title, 'content': content, 'author': author, 'date': date}
+        user_filters = {
+            'title': title,
+            'content': content,
+            'author': author,
+            'date': date
+        }
         filtered_posts = posts
         if any(filter_content for filter_content in user_filters.values()):
             for filter_type, filter_content in user_filters.items():
                 if filter_content:
-                    filtered_posts = [post for post in filtered_posts if filter_content.casefold() in post[filter_type].casefold()]
+                    filtered_posts = [post for post
+                                      in filtered_posts
+                                      if filter_content.casefold()
+                                      in post[filter_type].casefold()]
             return filtered_posts
 
 
         if sort or direction:
             if helper.validate_filters(sort, direction):
                 if sort and direction:
-                    sorted_posts = sorted(posts, key= lambda post: post[sort].casefold(), reverse=direction == 'desc')
+                    sorted_posts = sorted(posts,
+                                          key= lambda post: post[sort].casefold(),
+                                          reverse=direction == 'desc')
                     return jsonify(sorted_posts)
                 elif sort:
-                    sorted_posts = sorted(posts, key=lambda post: post[sort].casefold())
+                    sorted_posts = sorted(posts,
+                                          key=lambda post: post[sort].casefold())
                     return jsonify(sorted_posts)
                 elif direction:
-                    sorted_posts = sorted(posts, key=itemgetter('id'), reverse=direction == 'desc')
+                    sorted_posts = sorted(posts,
+                                          key=itemgetter('id'),
+                                          reverse=direction == 'desc')
                     return jsonify(sorted_posts)
             else:
                 return jsonify({"error": "Bad Request"}), 400
